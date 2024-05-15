@@ -1,0 +1,25 @@
+doctype html
+html
+  head
+    title= title
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+    link(rel="stylesheet", href="/css/style.css")
+  body
+    h1 Deal Object Table
+    a(href="/update-cobj") Add to this table
+    table
+      thead
+        tr
+          th ID
+          th Name
+          th Stage
+          th Amount 
+      tbody
+        each item in data
+          tr
+            td= item.id
+            td= item.properties.dealname
+            td= item.properties.dealstage
+            td= item.properties.amount
+            td
+              a(href="/update-cobj?id=" + item.id) Edit
