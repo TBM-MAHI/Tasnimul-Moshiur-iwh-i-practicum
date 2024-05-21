@@ -15,13 +15,14 @@ const PRIVATE_APP_ACCESS = process.env.APP_ACCESS_TOKEN;
 
 // * Code for Route 1 goes here
 app.get('/deals', async (req, res) => {
-    const contacts = 'https://api.hubapi.com/crm/v3/objects/deals';
+    console.log("here /deals")
+    const deals = 'https://api.hubapi.com/crm/v3/objects/deals';
     const headers = {
         Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
         'Content-Type': 'application/json'
     }
     try {
-        const resp = await axios.get(contacts, { headers });
+        const resp = await axios.get(deals, { headers });
         const data = resp.data.results;
         res.render('homepage', { title: 'Deals | HubSpot APIs', data });
     } catch (error) {
@@ -29,9 +30,31 @@ app.get('/deals', async (req, res) => {
     }
 });
 
+
+
 // TODO: ROUTE 2 - Create a new app.get route for the form to create or update new custom object data. Send this data along in the next route.
 
-// * Code for Route 2 goes here
+app.get('/update-cobj', async (req, res) => {
+    if (req.query.id) {
+        const objectId = req.query.id;
+        const url = `https://api.hubspot.com/crm/v3/objects/deals/${objectId}?properties=dealname,dealstage,pipeline,amount`;
+        const headers = {
+            Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
+            'Content-Type': 'application/json'
+        };
+        try {
+            const response = await axios.get(url, { headers });
+            const data = response.data;
+            res.render('updates', { title: 'Update Deal Object Form | Integrating With HubSpot I Practicum.', data });
+        } catch (error) {
+            console.error(error);
+            res.status(500).send("Error retrieving custom object data");
+        }
+    } else {
+        // no existing object ID, render the form for creating new object
+        res.render('updates', { title: 'Create Deal Object | My HubSpot App' });
+    }
+});
 
 // TODO: ROUTE 3 - Create a new app.post route for the custom objects form to create or update your custom object data. Once executed, redirect the user to the homepage.
 
@@ -46,9 +69,11 @@ app.post('/update-cobj', async (req, res) => {
         };
         const update = {
             properties: {
-                name: req.body.name,
-                bio: req.body.bio,
-                description: req.body.description
+                dealname: req.body.dealname,
+                pipeline: "default",
+                dealstage: req.body.dealstage,
+                description: req.body.description,
+                amount: req.body.dealstage
             }
         };
         try {
@@ -60,24 +85,26 @@ app.post('/update-cobj', async (req, res) => {
         }
     } else {
         // no existing object ID, create a new object
-        const url = 'https://api.hubspot.com/crm/v3/objects/pets';
+        const url = 'https://api.hubspot.com/crm/v3/objects/deals';
         const headers = {
             Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
             'Content-Type': 'application/json'
         };
-        const newObject = {
+        const newDeal = {
             properties: {
-                name: req.body.name,
-                bio: req.body.bio,
+                dealname: req.body.dealname,
+                pipeline: "default",
+                dealstage: req.body.dealstage,
                 description: req.body.description,
+                amount: req.body.dealstage,
             }
         };
         try {
-            await axios.post(url, newObject, { headers });
+            await axios.post(url, newDeal, { headers });
             res.redirect('/');
         } catch (error) {
             console.error(error);
-            res.status(500).send("Error creating custom object");
+            res.status(500).send("Error creating Deal object");
         }
     }
 });
@@ -85,7 +112,7 @@ app.post('/update-cobj', async (req, res) => {
 * * This is sample code to give you a reference for how you should structure your calls. 
 
 * * App.get sample
-app.get('/contacts', async (req, res) => {
+app.get('/deals', async (req, res) => {
     const contacts = 'https://api.hubspot.com/crm/v3/objects/contacts';
     const headers = {
         Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
