@@ -4,19 +4,22 @@ html
     title #{title}
     link(rel="stylesheet", href="/css/style.css")
   body
-    h1 #{data ? "Update Deal  Object" : "Create Deal Object"}
-    a(href="/deal") Return to homepage
+    h1 #{data ? "Update Deal Object" : "Create Deal Object"}
+    a(href="/deals") Return to homepage
     form(method="POST" action=data ? `/update-cobj?id=${data.id}` : "/update-cobj")
       .inputDiv
         label Deal Name:
-        input(type="text" name="name" value=data ? data.properties.dealname : '')
+        input(type="text" name="dealname" value=data ? data.properties.dealname : '')
       .inputDiv
         label Description:
-        input(type="text" name="name" value=data ? data.properties.description : '')
+        input(type="text" name="description" value=data ? data.properties.description : '')
       .inputDiv
         label Deal Stage:
-        input(type="text" name="bio" value=data ? data.properties.dealstage : '')
+        select(name="dealstage")
+          option(value="appointmentscheduled" selected=data && data.properties.dealstage === 'appointmentscheduled') appointmentscheduled
+          option(value="qualifiedtobuy" selected=data && data.properties.dealstage === 'qualifiedtobuy') qualifiedtobuy
+          option(value="presentationscheduled" selected=data && data.properties.dealstage === 'presentationscheduled') presentationscheduled
       .inputDiv
         label Amount:
-        input(type="number" name="description" value=data ? data.properties.amount : '')
+        input(type="number" name="amount" value=data ? data.properties.amount : '')
       button(type="submit") #{data ? "Update" : "Create"}

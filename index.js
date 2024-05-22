@@ -37,7 +37,7 @@ app.get('/deals', async (req, res) => {
 app.get('/update-cobj', async (req, res) => {
     if (req.query.id) {
         const objectId = req.query.id;
-        const url = `https://api.hubspot.com/crm/v3/objects/deals/${objectId}?properties=dealname,dealstage,pipeline,amount`;
+        const url = `https://api.hubspot.com/crm/v3/objects/deals/${objectId}?properties=dealname,dealstage,description,pipeline,amount`;
         const headers = {
             Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
             'Content-Type': 'application/json'
@@ -73,18 +73,19 @@ app.post('/update-cobj', async (req, res) => {
                 pipeline: "default",
                 dealstage: req.body.dealstage,
                 description: req.body.description,
-                amount: req.body.dealstage
+                amount: req.body.amount
             }
         };
         try {
             await axios.patch(url, update, { headers });
-            res.redirect('/');
+            res.redirect('/deals');
         } catch (error) {
             console.error(error);
             res.status(500).send("Error updating custom object");
         }
     } else {
         // no existing object ID, create a new object
+        console.log("creating new Deal Obj");
         const url = 'https://api.hubspot.com/crm/v3/objects/deals';
         const headers = {
             Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
@@ -96,12 +97,12 @@ app.post('/update-cobj', async (req, res) => {
                 pipeline: "default",
                 dealstage: req.body.dealstage,
                 description: req.body.description,
-                amount: req.body.dealstage,
+                amount: req.body.amount,
             }
         };
         try {
             await axios.post(url, newDeal, { headers });
-            res.redirect('/');
+            res.redirect('/deals');
         } catch (error) {
             console.error(error);
             res.status(500).send("Error creating Deal object");
